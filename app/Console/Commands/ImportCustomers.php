@@ -39,7 +39,7 @@ class ImportCustomers extends Command
             'job_title' => $data[1],
             'email_address' => $data[2],
             'first_last_name' => $data[3],
-            'registered_since' => $data[4],
+            'registered_since' => $data[4], 
             'phone' => $data[5]
         ]);
             

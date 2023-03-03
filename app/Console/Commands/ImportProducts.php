@@ -29,6 +29,7 @@ class ImportProducts extends Command
      */
     public function handle()
     {
+        // this is test command for me.
         $file_n = storage_path('app\products.csv');
         $file = fopen($file_n, "r");
         $all_data = array();

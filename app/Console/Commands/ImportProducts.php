@@ -16,7 +16,7 @@ class ImportProducts extends Command
     protected $signature = 'import:products';
 
     /**
-     * The console command description.
+     * The console command description.test
      *
      * @var string
      */

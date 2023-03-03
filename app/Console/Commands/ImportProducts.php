@@ -32,7 +32,6 @@ class ImportProducts extends Command
         // this is test command for me.
         $file_n = storage_path('app\products.csv');
         $file = fopen($file_n, "r");
-        $all_data = array();
         Log::info("Products Started successfully");
         while (($data = fgetcsv($file, 200, ",")) !==FALSE) {
 

@@ -34,7 +34,7 @@ class ImportCustomers extends Command
         $file = fopen($file_n, "r");
         $all_data = array();
         while (($data = fgetcsv($file, 200, ",")) !==FALSE) {
-
+ 
             Customers::create([
             'job_title' => $data[1],
             'email_address' => $data[2],

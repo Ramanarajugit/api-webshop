@@ -75,7 +75,7 @@ public function show($id)
     return $this->sendResponse(new OrderResource($orders), 'Order Retrieved Successfully.');
     }else{
 
-        return $this->sendResponse(404, 'Order Not Found.');
+        return $this->sendError('Order not found.');
     }  
 }
 /**
@@ -117,7 +117,7 @@ public function update(Request $request,$id)
    return $this->sendResponse(new OrderResource($orders), 'Order Updated Successfully.');
     }else{
 
-        return $this->sendResponse(404, 'Order Not Found.');
+        return $this->sendError('Order not found.');
     }  
 }
 /**
@@ -136,7 +136,7 @@ public function destroy($id)
 
     }else{
 
-        return $this->sendResponse(404, 'Order Not Found.');
+        return $this->sendError('Order not found.');
     }    
 }
 }

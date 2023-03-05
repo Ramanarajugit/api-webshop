@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Orders;
 use App\Models\OrderProducts;
-class OrdersController extends Controller
+use App\Http\Resources\OrderResource;
+use App\Http\Controllers\Api\BaseController as BaseController;
+class OrdersController extends BaseController
 {
     /**
 * Display a listing of the resource.
@@ -15,15 +17,9 @@ class OrdersController extends Controller
 */
 public function index()
 {
+    $orders = Orders::all();
+    return $this->sendResponse(OrderResource::collection($orders), 'Orders Retrieved Successfully.');
 
-
-$orders = Orders::all();
-
-return response()->json([
-"success" => true,
-"message" => "Orders List",
-"data" => $orders
-]);
 }
 
 /**
@@ -35,29 +31,30 @@ return response()->json([
 public function store(Request $request)
 {
 
-$orders = json_decode($request->getContent(), true);
-
-$data = Orders::create([
-    'is_pay' => $orders['is_pay'],
-    'customers_id' => $orders['customers_id']
- ]);
-
-
-
-foreach($orders['products'] as $product){
-
-    OrderProducts::create([
-        'products_id' => $product['products_id'],
-        'orders_id' => $data->id
-     ]);
+    $input = $request->all();
    
-}
+    $validator = Validator::make($input, [
+        'customers_id' => 'required',
+        'is_pay' => 'required'
+    ]);
 
-return response()->json([
-"success" => true,
-"message" => "Order created successfully.",
-"data" => $data
-]);
+    if($validator->fails()){
+        return $this->sendError('Validation Error.', $validator->errors());       
+    }
+
+    $orders = Orders::create($input);
+
+    foreach($input['products'] as $product){
+
+        OrderProducts::create([
+            'products_id' => $product['products_id'],
+            'orders_id' => $orders->id
+         ]);
+       
+    }
+
+    return $this->sendResponse(new OrderResource($orders), 'Order Created Successfully.');
+
 
 } 
 /**
@@ -68,15 +65,14 @@ return response()->json([
 */
 public function show($id)
 {
-$orders = Orders::find($id);
-if (is_null($orders)) {
-return $this->sendError('Order not found.');
-}
-return response()->json([
-"success" => true,
-"message" => "Order retrieved successfully.",
-"data" => $orders
-]);
+    $orders = Orders::find($id);
+  
+    if (is_null($orders)) {
+        return $this->sendError('Order not found.');
+    }
+
+    return $this->sendResponse(new OrderResource($orders), 'Order Retrieved Successfully.');
+
 }
 /**
 * Update the specified resource in storage.
@@ -87,15 +83,22 @@ return response()->json([
 */
 public function update(Request $request,$id)
 {
-    $orders = json_decode($request->getContent(), true);
- 
-    $order = Orders::find($id);   
-    $order->is_pay = $orders['is_pay'];
-    $order->save();
+    $input = $request->all();
+   
+    $validator = Validator::make($input, [
+        'is_pay' => 'required'
+    ]);
+
+    if($validator->fails()){
+        return $this->sendError('Validation Error.', $validator->errors());       
+    }
+    $orders = Orders::find($id);   
+    $orders->is_pay = $input['is_pay'];
+    $orders->save();
 
     $orderproducts = OrderProducts::where('id',$id)->get();
     
-    foreach($orders['products'] as $product){
+    foreach($input['products'] as $product){
 
         OrderProducts::create([
             'products_id' => $product['products_id'],
@@ -104,11 +107,8 @@ public function update(Request $request,$id)
        
     }
 
-    return response()->json([
-    "success" => true,
-    "message" => "Order updated successfully.",
-    "data" => $order
-    ]);
+   return $this->sendResponse(new OrderResource($orders), 'Order Updated Successfully.');
+   
 }
 /**
 * Remove the specified resource from storage.
@@ -119,12 +119,9 @@ public function update(Request $request,$id)
 public function destroy($id)
 {
    
-$order = Orders::find($id);
-$order->delete();
-return response()->json([
-"success" => true,
-"message" => "Order deleted successfully.",
-"data" => $order
-]);
+    $orders = Orders::find($id);
+    $orders->delete();
+
+    return $this->sendResponse([], 'Order Deleted Successfully.');
 }
 }

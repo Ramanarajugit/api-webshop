@@ -32,7 +32,7 @@ class ImportProducts extends Command
         // this is test command for me.
         $file_n = storage_path('app\products.csv');
         $file = fopen($file_n, "r");
-        Log::info("Products Started successfully");
+        Log::info("Products import started successfully");
         while (($data = fgetcsv($file, 200, ",")) !==FALSE) {
 
             Products::create(['product_name' => $data[1],'price' => $data[2]]);
@@ -40,7 +40,7 @@ class ImportProducts extends Command
         }
         fclose($file);
 
-        Log::info("Products Updated successfully");
+        Log::info("Products import completed successfully");
         return Command::SUCCESS;
     }
 }

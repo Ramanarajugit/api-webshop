@@ -65,6 +65,7 @@ public function store(Request $request)
 */
 public function show($id)
 {
+    if (Orders::where('id', $id)->exists()) {
     $orders = Orders::find($id);
   
     if (is_null($orders)) {
@@ -72,7 +73,10 @@ public function show($id)
     }
 
     return $this->sendResponse(new OrderResource($orders), 'Order Retrieved Successfully.');
+    }else{
 
+        return $this->sendResponse(404, 'Order Not Found.');
+    }  
 }
 /**
 * Update the specified resource in storage.
@@ -83,6 +87,7 @@ public function show($id)
 */
 public function update(Request $request,$id)
 {
+    if (Orders::where('id', $id)->exists()) {
     $input = $request->all();
    
     $validator = Validator::make($input, [
@@ -96,7 +101,9 @@ public function update(Request $request,$id)
     $orders->is_pay = $input['is_pay'];
     $orders->save();
 
-    $orderproducts = OrderProducts::where('id',$id)->get();
+    $orderproducts = OrderProducts::find($id);
+    $orderproducts->delete();
+    
     
     foreach($input['products'] as $product){
 
@@ -108,7 +115,10 @@ public function update(Request $request,$id)
     }
 
    return $this->sendResponse(new OrderResource($orders), 'Order Updated Successfully.');
-   
+    }else{
+
+        return $this->sendResponse(404, 'Order Not Found.');
+    }  
 }
 /**
 * Remove the specified resource from storage.
@@ -118,10 +128,15 @@ public function update(Request $request,$id)
 */
 public function destroy($id)
 {
-   
+    if (Orders::where('id', $id)->exists()) {
     $orders = Orders::find($id);
     $orders->delete();
 
-    return $this->sendResponse([], 'Order Deleted Successfully.');
+    return $this->sendResponse(200, 'Order Deleted Successfully.');
+
+    }else{
+
+        return $this->sendResponse(404, 'Order Not Found.');
+    }    
 }
 }
